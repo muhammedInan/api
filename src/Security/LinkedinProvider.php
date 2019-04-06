@@ -56,8 +56,8 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
           $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
           'form_params' => [
-            'client_id' => '86rp8hhouxo716',
-            'client_secret' => '2rbAb7HegC2c4Yg0',
+            'client_id' => '86j5689ioqzfe8',
+            'client_secret' => 'qFDQrYJ6guvjY67b',
             'code' => $code,
             'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
             'grant_type' => 'authorization_code',
@@ -65,12 +65,12 @@ class LinkedinProvider implements UserProviderInterface
 ]);//dd($response->getBody()->getContents()); $url, $data
 
         $client = new Client();
-        $body = $client->post()->getBody($response)->getContents();
+        $body = $client->post('http://127.0.0.1:8000/api/signin')->getBody($response)->getContents();
         
         $result = $req->execute();
         $accesstoken = json_decode($result);
         
-        $data = sprintf(' https://github.com/login/oauth/authorize');
+         $data = sprintf(' https://github.com/login/oauth/authorize');
         $this->githubClientId;
         $this->githubClilentSecret;
         $code;
@@ -85,7 +85,7 @@ class LinkedinProvider implements UserProviderInterface
             throw new BadConversionException('No access_token returned by Github. Start ever the process.');
 
         }
-        return $token;
+        return $response->getBody();
         }
 
     public function getUserFromAPI(string $token)

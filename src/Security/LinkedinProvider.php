@@ -66,9 +66,7 @@ class LinkedinProvider implements UserProviderInterface
 
 $body = $response->getBody()->getContents();
  
-
-       
-         $accesstoken = json_decode($body, TRUE);
+       $accesstoken = json_decode($body, TRUE);
         $token = $accesstoken['access_token'];
         if (!isset($token)){
             throw new BadConversionException('No access_token returned by Linkedin. Start ever the process.');

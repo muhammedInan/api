@@ -26,7 +26,7 @@ class LinkedinProvider implements UserProviderInterface
         if (!$userData) {
             throw new \LogicException('Did not managed to get your user info from Github.');
         }
-        //return new User($userData['login'], $userData['name'], $userData['email'], $userData['avatar_url'], $userData['html_url']);
+
         $user = new User($username, null);
 
         return $user;
@@ -56,54 +56,47 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
           $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
           'form_params' => [
-            'client_id' => '86j5689ioqzfe8',
-            'client_secret' => 'qFDQrYJ6guvjY67b',
+            'client_id' => '',
+            'client_secret' => '',
             'code' => $code,
             'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
             'grant_type' => 'authorization_code',
     ]
-]);//dd($response->getBody()->getContents()); $url, $data
+]);
 
-        $client = new Client();
-        $body = $client->post('http://127.0.0.1:8000/api/signin')->getBody($response)->getContents();
-        
-        $result = $req->execute();
-        $accesstoken = json_decode($result);
-        
-         $data = sprintf(' https://github.com/login/oauth/authorize');
-        $this->githubClientId;
-        $this->githubClilentSecret;
-        $code;
-           urlencode("http://localhost:8000/login_check");
+$body = $response->getBody()->getContents();
+ 
 
-        $body = $this->client()->post($data)->getBody()->getContents();
-
-        $tab = explode("-", $body);
-        $token = explode("&", $tab[1]);
-        $token = $token[0];
+       
+         $accesstoken = json_decode($body, TRUE);
+        $token = $accesstoken['access_token'];
         if (!isset($token)){
-            throw new BadConversionException('No access_token returned by Github. Start ever the process.');
-
+            throw new BadConversionException('No access_token returned by Linkedin. Start ever the process.');
         }
-        return $response->getBody();
+        return $token;
         }
 
     public function getUserFromAPI(string $token)
     {
-        $response =
-            $this->client()
-                ->get("https://api.github.com/user?access token".$token)
-                ->getBody()
-                ->getContents();
+        dd($token);
+        $client = new \GuzzleHttp\Client();
+
+        $response = $client->request('GET','https://api.linkedin.com/v2/me', [
+            'headers' =>[
+                'Authorization' => 'Bearer '.$token
+            ]]);
+
+            $body = $response->getBody()->getContents();
+            dd($body);
 
         if (empty($response)){
-            throw new \LogicException('Did not managed to get your user into from Github');
+            throw new \LogicException('Did not managed to get your user into from Linkedin');
         }
 
         $data = \json_decode($response, true);
 
         $user = new User();
-        $user->setEmail();
+        $user->setEmail('toto');
     }
 
     public function supportsClass($class)

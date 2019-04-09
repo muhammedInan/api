@@ -30,8 +30,8 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         // todo
-        $this->linkedinProvider ->getAccessTokenFromAPI($credentials['code']);
-       
+       $token =  $this->linkedinProvider ->getAccessTokenFromAPI($credentials['code']);
+       $this->linkedinProvider->getUserFromAPI($token);
     }
 
     public function checkCredentials($credentials, UserInterface $user)

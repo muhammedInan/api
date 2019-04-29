@@ -10,10 +10,21 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use App\Utils\HttpRequest;
 use http\Exception\BadConversionException;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use App\Entity\Client as EntityClient;
 
 class LinkedinProvider implements UserProviderInterface
 {
     private $client;
+
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+     
+        $this->em = $em;
+    }
 
    public function loadUserByUsername($username)
     {
@@ -26,7 +37,7 @@ class LinkedinProvider implements UserProviderInterface
         if (!$userData) {
             throw new \LogicException('Did not managed to get your user info from Github.');
         }
-
+        
         $user = new User($username, null);
 
         return $user;
@@ -56,8 +67,8 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
           $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
           'form_params' => [
-            'client_id' => '',
-            'client_secret' => '',
+            'client_id' => 'clientid',
+            'client_secret' => 'clientSecret',
             'code' => $code,
             'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
             'grant_type' => 'authorization_code',
@@ -66,7 +77,9 @@ class LinkedinProvider implements UserProviderInterface
 
 $body = $response->getBody()->getContents();
  
-       $accesstoken = json_decode($body, TRUE);
+
+       
+         $accesstoken = json_decode($body, TRUE);
         $token = $accesstoken['access_token'];
         if (!isset($token)){
             throw new BadConversionException('No access_token returned by Linkedin. Start ever the process.');
@@ -76,7 +89,7 @@ $body = $response->getBody()->getContents();
 
     public function getUserFromAPI(string $token)
     {
-        dd($token);
+       
         $client = new \GuzzleHttp\Client();
 
         $response = $client->request('GET','https://api.linkedin.com/v2/me', [
@@ -85,22 +98,32 @@ $body = $response->getBody()->getContents();
             ]]);
 
             $body = $response->getBody()->getContents();
-            dd($body);
+            
 
         if (empty($response)){
             throw new \LogicException('Did not managed to get your user into from Linkedin');
         }
 
-        $data = \json_decode($response, true);
+        $data = \json_decode($body, true);
+     // $customer = $this->em->getRepository(EntityClient::class)->find(5);
+        //recuperer l'user que l'api me donne un email
 
-        $user = new User();
-        $user->setEmail('toto');
+        $user = $this->em->getRepository(EntityUser::class)->find($token);
+        $user->setToken($token);
+        $user->setEmail('monemail.fr');
+        //$user->setFirstName($data['localizedFirstName']);
+        //$user->setLastName($data['localizedLastName']);
+        //$user->setClient($customer);
+        //$this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
     }
 
     public function supportsClass($class)
     {
         return 'App\Entity\User' === $class;
-        ///return 'Symfony\Component\Security\Core\User\User' === $class;
+        
     }
 
 

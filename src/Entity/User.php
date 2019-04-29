@@ -4,8 +4,29 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
+ *
+  * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "user_show",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *      absolute = true
+ *      )
+ * )
+ *
+ *  @Hateoas\Relation(
+ *      "new",
+ *      href = @Hateoas\Route(
+ *          "user_create",
+ *      absolute = true
+ *
+ *     )
+ * )
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface
@@ -18,19 +39,85 @@ class User implements UserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=400, nullable=true)
      */
     private $email;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="string", length=255)
      */
+    private $firstName;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $lastName;
+
+    /**
+     * @ORM\Column(type="string", length=400,  nullable=true)
+     */
+    private $token;
+
+    
     private $roles = [];
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="users")
+     */
+    private $client;
 
     public function getId(): ?int
     {
         return $this->id;
     }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+    public function setClient(Client $client): self
+    {
+        $this->client = $client;
+        // set the owning side of the relation if necessary
+       
+        return $this;
+    }
+
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+   
+    public function setToken($token): void
+    {
+        $this->token = $token;
+    }
+
 
     public function getEmail(): ?string
     {

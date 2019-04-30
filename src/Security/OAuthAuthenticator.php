@@ -8,54 +8,95 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class OAuthAuthenticator extends AbstractGuardAuthenticator
 {
-    public function __construct(LinkedinProvider $linkedinProvider)
+    private $repository;
+    private $linkedinProvider;
+
+    public function __construct(LinkedinProvider $linkedinProvider, UserRepository $repository)
     {
-     $this->linkedinProvider = $linkedinProvider;
+        $this->linkedinProvider = $linkedinProvider;
+        $this->repository = $repository;
     }
     public function supports(Request $request)
     {
-        // todo
-        return $request->attributes->get('_route') == 'signin';
+        return $request->headers->get('authorization') || $request->query->get('code');
     }
+  
 
     public function getCredentials(Request $request)
     {
-        // todo
-        return ['code'=> $request->get('code')];
+
+        if ($request->headers->get('authorization')) {
+            $bearer = str_replace("Bearer ", "", $request->headers->get('authorization'));
+
+            return [
+                'bearer' => $bearer
+            ];
+        }
+
+        return ['code' => $request->get('code')];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        // todo
-       $token =  $this->linkedinProvider ->getAccessTokenFromAPI($credentials['code']);
-       $this->linkedinProvider->getUserFromAPI($token);
+        if (isset($credentials['bearer'])) {
+
+            $user = $this->repository->findOneBy(['token' => $credentials['bearer']]);
+
+            if (null == $user) {
+                return ;
+            }
+
+            return $user;
+        }
+
+        if (null == $credentials['code']) {
+            return;
+        }
+
+        $token =  $this->linkedinProvider->getAccessTokenFromAPI($credentials['code']);
+        $user = $this->linkedinProvider->getUserFromAPI($token);
+
+        return $user;
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        // todo
+        return true;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        // todo
+        $data = [
+            'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
+        ];
+
+        return new JsonResponse('You should be connect to access', Response::HTTP_FORBIDDEN);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        // todo
+        return null;
     }
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        // todo
+        $data = [
+            'message' => 'Authentication Required'
+        ];
+
+        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
     public function supportsRememberMe()
     {
-        // todo
+        return false;
     }
 }

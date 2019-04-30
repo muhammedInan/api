@@ -13,6 +13,7 @@ use http\Exception\BadConversionException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use App\Entity\Client as EntityClient;
+use App\Entity\User as EntityUser;
 
 class LinkedinProvider implements UserProviderInterface
 {
@@ -67,20 +68,20 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
           $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
           'form_params' => [
-            'client_id' => 'clientid',
-            'client_secret' => 'clientSecret',
+            'client_id' => '7762mkrd0m4gif',
+            'client_secret' => 'BuGnWlmygeQQRgx2',
             'code' => $code,
             'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
             'grant_type' => 'authorization_code',
-    ]
-]);
+            ]
+          ]);
 
-$body = $response->getBody()->getContents();
+         $body = $response->getBody()->getContents();
  
-
-       
          $accesstoken = json_decode($body, TRUE);
+
         $token = $accesstoken['access_token'];
+
         if (!isset($token)){
             throw new BadConversionException('No access_token returned by Linkedin. Start ever the process.');
         }
@@ -108,9 +109,11 @@ $body = $response->getBody()->getContents();
      // $customer = $this->em->getRepository(EntityClient::class)->find(5);
         //recuperer l'user que l'api me donne un email
 
-        $user = $this->em->getRepository(EntityUser::class)->find($token);
+        $user = $this->em->getRepository(EntityUser::class)->findOneBy($data['localizedFirstName']);
         $user->setToken($token);
         $user->setEmail('monemail.fr');
+        $user->setFirstName($data['localizedFirstName']);
+
         //$user->setFirstName($data['localizedFirstName']);
         //$user->setLastName($data['localizedLastName']);
         //$user->setClient($customer);

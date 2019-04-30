@@ -53,29 +53,22 @@ class SecurityController extends AbstractController
      */
     public function users($user, $page, SerializerInterface $serializer)
     {
-
         if ($clientId = $this->getUser()->getClient()->getId() !== null) {
-
             $users = $this->userRepository->findBy(['client_id' => $clientId]);
-
             $response = new Response($serializer->serialize($users, 'json'), Response::HTTP_OK);
             $response->setSharedMaxAge(3600);
             $response->headers->addCacheControlDirective('must-revalidate', true);
-
             return $response;
         }
         return new Response($serializer->serialize($users, 'json'), Response::HTTP_UNAUTHORIZED);
     }
-
 
     /**
      * @Route("/login", name="login")
      */
     public function loginAction(Request $request, AuthenticationUtils $authUtils)
     {
-
         $error = $authUtils->getLastAuthenticationError();
-
         $lastUsername = $authUtils->getLastUsername();
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
@@ -88,20 +81,14 @@ class SecurityController extends AbstractController
      */
     public function show(int $id, SerializerInterface $serializer)
     {
-
         if ($client = $this->getUser()->getClient() !== null) {
-
             $user = $this->userRepository->find($id);
-
             $response = new Response($serializer->serialize($user, 'json'), Response::HTTP_OK);
             $response->setSharedMaxAge(3600);
             $response->headers->addCacheControlDirective('must-revalidate', true);
-
             if ($user == null) {
-
                 return new Response($serializer->serialize($user, 'json'), Response::HTTP_NOT_FOUND);
             }
-
             return $response;
         }
     }
@@ -112,7 +99,6 @@ class SecurityController extends AbstractController
     public function create(Request $request, SerializerInterface $serializer, $client)
     {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
-
         $client = $this->getUser()->getClient();
 
         $user = new User();
@@ -121,11 +107,10 @@ class SecurityController extends AbstractController
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-
         return new Response($serializer->serialize($user, HTTP_CREATED));
     }
 
-     /**
+    /**
      * @Route("api/users/{id}", name="user_delete", methods="DELETE")
      */
     public function delete($id)
@@ -133,11 +118,10 @@ class SecurityController extends AbstractController
         if ($client = $this->getUser()->getClient() !== null) {
             $user = $this->userRepository->find($id);
             if (!$user) {
-            $response = new Response(null, HTTP_NO_CONTENT);
-            $response->setSharedMaxAge(3600);
-            $response->headers->addCacheControlDirective('must-revalidate', true);
+                $response = new Response(null, HTTP_NO_CONTENT);
+                $response->setSharedMaxAge(3600);
+                $response->headers->addCacheControlDirective('must-revalidate', true);
             }
-            
         }
         if (!$user) {
             return new Response(Response::HTTP_NOT_FOUND);
@@ -145,7 +129,6 @@ class SecurityController extends AbstractController
 
         $this->entityManager->remove($user);
         $this->entityManager->flush();
-
         return $response;
     }
 }

@@ -18,29 +18,23 @@ use App\Entity\User as EntityUser;
 class LinkedinProvider implements UserProviderInterface
 {
     private $client;
-
     private $em;
 
     public function __construct(EntityManagerInterface $em)
     {
-
         $this->em = $em;
     }
 
     public function loadUserByUsername($username)
     {
         $url = 'https://www.linkedin.com/oauth/v2/accessToken=' . $username;
-
         $response = $this->client->get($url);
         $res = $response->getBody()->getContents();
         $userData = $this->serializer->deserialize($res, 'array', 'json');
-
         if (!$userData) {
             throw new \LogicException('Did not managed to get your user info from Github.');
         }
-
         $user = new User($username, null);
-
         return $user;
     }
 
@@ -50,15 +44,12 @@ class LinkedinProvider implements UserProviderInterface
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException();
         }
-
         return $user;
     }
-
 
     public function getUser(string $code)
     {
         $token = $this->getAccessTokenFromAPI($code);
-
         return $this->getAccessTokenFromAPI($token);
     }
 
@@ -75,13 +66,9 @@ class LinkedinProvider implements UserProviderInterface
                 'grant_type' => 'authorization_code',
             ]
         ]);
-
         $body = $response->getBody()->getContents();
-
         $accesstoken = json_decode($body, TRUE);
-
         $token = $accesstoken['access_token'];
-
         if (!isset($token)) {
             throw new BadConversionException('No access_token returned by Linkedin. Start ever the process.');
         }
@@ -92,29 +79,23 @@ class LinkedinProvider implements UserProviderInterface
     {
 
         $client = new \GuzzleHttp\Client();
-
         $response = $client->request('GET', 'https://api.linkedin.com/v2/me', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token
             ]
         ]);
-
         $body = $response->getBody()->getContents();
-
-
         if (empty($response)) {
             throw new \LogicException('Did not managed to get your user into from Linkedin');
         }
-
         $data = \json_decode($body, true);
-    
 
         $user = $this->em->getRepository(EntityUser::class)->findOneBy($data['localizedFirstName']);
         $user->setToken($token);
-        $user->setEmail('monemail.fr');
+        //$user->setEmail('monemail.fr');
         $user->setFirstName($data['localizedFirstName']);
-        $this->em->flush();
 
+        $this->em->flush();
         return $user;
     }
 

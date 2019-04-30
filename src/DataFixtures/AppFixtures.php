@@ -8,7 +8,6 @@ use App\Entity\Product;
 use App\Entity\User;
 use App\Entity\Client;
 
-
 class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
@@ -51,66 +50,47 @@ class AppFixtures extends Fixture
             8 => 'N.C',
             9 => '1,2 Mhz',
             10 => '1.25 Mhz'
-
-
         ];
 
         $sizeName = count($name);
 
-         for ($i = 1; $i < $sizeName; $i++) {
+        for ($i = 1; $i < $sizeName; $i++) {
 
-             $product = new Product();
-             $product->setName($name[$i]);
-             $product->setMemory($memory[$i]);
-             $product->setProcessor($processor[$i]);
+            $product = new Product();
+            $product->setName($name[$i]);
+            $product->setMemory($memory[$i]);
+            $product->setProcessor($processor[$i]);
 
-             $manager->persist($product);
-
-         }
+            $manager->persist($product);
+        }
 
         $client = new Client();
         $client->setName('Blue Mobile Shop');
         $client->setAdress(' rue test');
-    
 
         $manager->persist($client);
 
         $client2 = new Client();
         $client2->setName('Red Mobile Shop');
         $client2->setAdress('red test');
-      
-        
+
         $manager->persist($client2);
         // Generate demoCustomer's users.
-        for($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $User = new User();
             if ($i < 11) {
-                
-                $User->setEmail('demoMail'.$i.'@blueMobileShop.com');
-                $User->setFirstName('BlueDemoUser-'.$i.'-FirstName');
-                $User->setLastName('BlueDemoUser-'.$i.'-LastName');
-               $User->setClient($client);
+                $User->setEmail('demoMail' . $i . '@blueMobileShop.com');
+                $User->setFirstName('BlueDemoUser-' . $i . '-FirstName');
+                $User->setLastName('BlueDemoUser-' . $i . '-LastName');
+                $User->setClient($client);
             } else {
-                
-                $User->setEmail('demoMail'.$i.'@redMobileShop.com');
-                $User->setFirstName('RedDemoUser'.$i.'FirstName');
-                $User->setLastName('RedDemoUser'.$i.'LastName');
+                $User->setEmail('demoMail' . $i . '@redMobileShop.com');
+                $User->setFirstName('RedDemoUser' . $i . 'FirstName');
+                $User->setLastName('RedDemoUser' . $i . 'LastName');
                 $User->setClient($client2);
             }
             $manager->persist($User);
         }
         $manager->flush();
-    
-
-
-         
-
-        // }
-        
-        // $user = new User();
-        // $user->setEmail('muhammedinan@gmail.com');
-        // $user->setClient($client);
-        // $manager->persist($user);
-        // $manager->flush();
     }
 }

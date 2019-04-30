@@ -8,8 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use JMS\Serializer\SerializerInterface; 
-
+use JMS\Serializer\SerializerInterface;
 
 class ProductController extends AbstractController
 {
@@ -33,16 +32,14 @@ class ProductController extends AbstractController
     public function products(SerializerInterface $serializer)
     {
         if ($this->getUser() !== null) {
+            $products = $this->productRepository->findAll();
 
-                $products = $this->productRepository->findAll();
-              
-                $response = new Response($serializer->serialize($products, 'json'), Response::HTTP_OK);
-                $response->setSharedMaxAge(3600);
-                $response->headers->addCacheControlDirective('must-revalidate', true);
-
-                return $response;
-            }
-        return new Response($serializer->serialize($products, 'json'),Response::HTTP_NOT_FOUND);
+            $response = new Response($serializer->serialize($products, 'json'), Response::HTTP_OK);
+            $response->setSharedMaxAge(3600);
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+            return $response;
+        }
+        return new Response($serializer->serialize($products, 'json'), Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -50,20 +47,13 @@ class ProductController extends AbstractController
      */
     public function show(int $id, SerializerInterface $serializer)
     {
-
-         $product = $this->productRepository->find($id);
-
-         $response = new Response($this->serializer->serialize($product, 'json'),  Response::HTTP_OK);
-         $response->setSharedMaxAge(3600);
-         $response->headers->addCacheControlDirective('must-revalidate', true);
-
-         if (!$product) {
-             
-            return new Response($this->serializer->serialize($product, 'json'),Response::HTTP_NOT_FOUND);
+        $product = $this->productRepository->find($id);
+        $response = new Response($this->serializer->serialize($product, 'json'),  Response::HTTP_OK);
+        $response->setSharedMaxAge(3600);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+        if (!$product) {
+            return new Response($this->serializer->serialize($product, 'json'), Response::HTTP_NOT_FOUND);
         }
-
         return $response;
-
-        
     }
 }

@@ -28,7 +28,6 @@ class Client
      */
     protected $adress;
    
-
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="client")
      */
@@ -61,8 +60,7 @@ class Client
         return $this;
     }
    
-
-     /**
+    /**
      * @return mixed
      */
     public function getUsers()

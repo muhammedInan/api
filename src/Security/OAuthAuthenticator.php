@@ -24,43 +24,35 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
         $this->linkedinProvider = $linkedinProvider;
         $this->repository = $repository;
     }
+
     public function supports(Request $request)
     {
         return $request->headers->get('authorization') || $request->query->get('code');
     }
-  
 
     public function getCredentials(Request $request)
     {
-
         if ($request->headers->get('authorization')) {
             $bearer = str_replace("Bearer ", "", $request->headers->get('authorization'));
-
             return [
                 'bearer' => $bearer
             ];
         }
-
         return ['code' => $request->get('code')];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         if (isset($credentials['bearer'])) {
-
             $user = $this->repository->findOneBy(['token' => $credentials['bearer']]);
-
             if (null == $user) {
-                return ;
+                return;
             }
-
             return $user;
         }
-
         if (null == $credentials['code']) {
             return;
         }
-
         $token =  $this->linkedinProvider->getAccessTokenFromAPI($credentials['code']);
         $user = $this->linkedinProvider->getUserFromAPI($token);
 
@@ -77,7 +69,6 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
         $data = [
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
         ];
-
         return new JsonResponse('You should be connect to access', Response::HTTP_FORBIDDEN);
     }
 
@@ -91,7 +82,6 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
         $data = [
             'message' => 'Authentication Required'
         ];
-
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 

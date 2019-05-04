@@ -4,7 +4,7 @@
 
 Bilemo project api rest
 Web service exposing an API
-https://app.codacy.com/project/muhammedinandev/api/dashboard
+
 
 Getting Started
 You can download the project, or clone it with Git by using the green button "Clone or download". You can run it on your local machine for development and testing purposes.

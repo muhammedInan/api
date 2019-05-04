@@ -8,7 +8,6 @@ use JMS\Serializer\Serializer;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use App\Utils\HttpRequest;
 use http\Exception\BadConversionException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -60,7 +59,7 @@ class LinkedinProvider implements UserProviderInterface
         $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
             'form_params' => [
                 'client_id' => 'client_id',
-                'client_secret' => 'clientSecret',
+                'client_secret' => 'client_secret',
                 'code' => $code,
                 'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
                 'grant_type' => 'authorization_code',

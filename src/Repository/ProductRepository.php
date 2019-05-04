@@ -26,10 +26,7 @@ class ProductRepository extends ServiceEntityRepository
                        ->setMaxResults(5);
         
         $data = $qbd->getQuery()->getResult();
-            
-            
-        
-        return $data;
+         return $data;
     }
 
     // /**

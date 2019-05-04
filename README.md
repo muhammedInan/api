@@ -1,4 +1,7 @@
 # api
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8dd9dec784cd47ba87b091e2bf31a6de)](https://app.codacy.com/app/muhammedinandev/api?utm_source=github.com&utm_medium=referral&utm_content=muhammedInan/api&utm_campaign=Badge_Grade_Dashboard)
+
 Bilemo project api rest
 Web service exposing an API
 https://app.codacy.com/project/muhammedinandev/api/dashboard

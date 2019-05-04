@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -45,7 +44,7 @@ class ProductController extends AbstractController
     /**
      * @Route("api/products/{id}", name="product_show", methods="GET")
      */
-    public function show(int $id, SerializerInterface $serializer)
+    public function show(int $id)
     {
         $product = $this->productRepository->find($id);
         $response = new Response($this->serializer->serialize($product, 'json'),  Response::HTTP_OK);

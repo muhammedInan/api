@@ -22,16 +22,13 @@ class UserRepository extends ServiceEntityRepository
     public function getAll_pagination($client, $page)
     {
         $qbd = $this->createQueryBuilder('user');
-        
         $qbd->andWhere('user.client = :client')
         ->setParameter('client', $client)
         ->setFirstResult($page*5)
         ->setMaxResults(5);
         
         $data = $qbd->getQuery()->getResult();
-        
         return $data;
-
     }
 
     /* public function getPaginateListOfUsers($page = 1, $nbElements = 10)

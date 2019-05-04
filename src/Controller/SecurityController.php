@@ -51,7 +51,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/api/users", name="users", methods="GET")
      */
-    public function users($user, $page, SerializerInterface $serializer)
+    public function users(SerializerInterface $serializer)
     {
         if ($clientId = $this->getUser()->getClient()->getId() !== null) {
             $users = $this->userRepository->findBy(['client_id' => $clientId]);
@@ -66,7 +66,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function loginAction(Request $request, AuthenticationUtils $authUtils)
+    public function loginAction(AuthenticationUtils $authUtils)
     {
         $error = $authUtils->getLastAuthenticationError();
         $lastUsername = $authUtils->getLastUsername();

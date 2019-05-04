@@ -8,6 +8,7 @@ use JMS\Serializer\Serializer;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use App\Utils\HttpRequest;
 use http\Exception\BadConversionException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -21,7 +22,7 @@ class LinkedinProvider implements UserProviderInterface
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->em = $em;
+       $this->em = $em;
     }
 
     public function loadUserByUsername($username)
@@ -46,6 +47,7 @@ class LinkedinProvider implements UserProviderInterface
         return $user;
     }
 
+
     public function getUser(string $code)
     {
         $token = $this->getAccessTokenFromAPI($code);
@@ -58,8 +60,8 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
         $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
             'form_params' => [
-                'client_id' => 'client_id',
-                'client_secret' => 'client_secret',
+                'client_id' => '',
+                'client_secret' => '',
                 'code' => $code,
                 'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
                 'grant_type' => 'authorization_code',
@@ -88,13 +90,12 @@ class LinkedinProvider implements UserProviderInterface
             throw new \LogicException('Did not managed to get your user into from Linkedin');
         }
         $data = \json_decode($body, true);
-
         $user = $this->em->getRepository(EntityUser::class)->findOneBy($data['localizedFirstName']);
         $user->setToken($token);
-        //$user->setEmail('monemail.fr');
+        $user->setEmail('monemail.fr');
         $user->setFirstName($data['localizedFirstName']);
-
         $this->em->flush();
+
         return $user;
     }
 

@@ -5,9 +5,13 @@ namespace App\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class OAuthAuthenticator extends AbstractGuardAuthenticator
@@ -34,10 +38,10 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
                 'bearer' => $bearer
             ];
         }
-        return ['code' => $request->get('code')];
+    return ['code' => $request->get('code')];
     }
 
-    public function getUser($credentials)
+    public function getUser($credentials, UserProviderInterface $userProvider)
     {
         if (isset($credentials['bearer'])) {
             $user = $this->repository->findOneBy(['token' => $credentials['bearer']]);
@@ -55,12 +59,12 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
         return $user;
     }
 
-    public function checkCredentials($credentials)
+    public function checkCredentials($credentials, UserInterface $user)
     {
         return true;
     }
 
-    public function onAuthenticationFailure( AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = [
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
@@ -68,7 +72,7 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
         return new JsonResponse('You should be connect to access', Response::HTTP_FORBIDDEN);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         return null;
     }

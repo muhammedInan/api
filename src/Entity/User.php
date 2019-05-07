@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  *
@@ -40,16 +41,19 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=400, nullable=true)
+     * @Groups({"details"}) 
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"details"}) 
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"details"}) 
      */
     private $lastName;
 

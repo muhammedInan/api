@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
+use App\Entity\User;
 
 class SecurityController extends AbstractController
 {
@@ -48,20 +50,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/api/users", name="users", methods="GET")
-     */
-    public function users(SerializerInterface $serializer)
-    {
-        if ($clientId = $this->getUser()->getClient()->getId() !== null) {
-            $users = $this->userRepository->findBy(['client_id' => $clientId]);
-            $response = new Response($serializer->serialize($users, 'json'), Response::HTTP_OK);
-            $response->setSharedMaxAge(3600);
-            $response->headers->addCacheControlDirective('must-revalidate', true);
-            return $response;
-        }
-        return new Response($serializer->serialize($users, 'json'), Response::HTTP_UNAUTHORIZED);
-    }
+    
 
     /**
      * @Route("/login", name="login")
@@ -81,33 +70,51 @@ class SecurityController extends AbstractController
      */
     public function show(int $id, SerializerInterface $serializer)
     {
-        if ($client = $this->getUser()->getClient() !== null) {
+       // if ($client = $this->getUser()->getClient() !== null) {
             $user = $this->userRepository->find($id);
-            $response = new Response($serializer->serialize($user, 'json'), Response::HTTP_OK);
+            
+            $response = new Response($this->serializer->serialize($user, 'json',SerializationContext::create()->setGroups(array('details'))), Response::HTTP_OK);
             $response->setSharedMaxAge(3600);
             $response->headers->addCacheControlDirective('must-revalidate', true);
-            if ($user == null) {
-                return new Response($serializer->serialize($user, 'json'), Response::HTTP_NOT_FOUND);
+               if ($user == null) {
+              return new JsonResponse(['User NOT FOUND'],Response::HTTP_NOT_FOUND);
             }
+        
+            return $response;
+        
+    }
+
+    /**
+     * @Route("/api/users", name="users", methods="GET")
+     */
+    public function users(SerializerInterface $serializer)
+    {
+        if ( $this->getUser() !== null) {
+            $users = $this->userRepository->findAll();
+            $response = new Response($serializer->serialize($users, 'json'), Response::HTTP_OK);
+            $response->setSharedMaxAge(3600);
+            $response->headers->addCacheControlDirective('must-revalidate', true);
             return $response;
         }
+        return new Response($serializer->serialize($users, 'json'), Response::HTTP_UNAUTHORIZED);
     }
 
     /**
      * @Route("api/users", name="user_create", methods="POST")
      */
-    public function create(Request $request, SerializerInterface $serializer, $client)
+    public function create(Request $request, SerializerInterface $serializer)
     {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
         $client = $this->getUser()->getClient();
-
-        $user = new User();
-        $user->setName($user['name']);
         $user->setClient($client);
 
+        
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        return new Response($serializer->serialize($user, HTTP_CREATED));
+        
+        $user = $this->userRepository->find($user->getId());
+        return new Response($serializer->serialize($user,'json',SerializationContext::create()->setGroups(array('details'))), Response::HTTP_CREATED);
+        
     }
 
     /**
@@ -118,17 +125,17 @@ class SecurityController extends AbstractController
         if ($client = $this->getUser()->getClient() !== null) {
             $user = $this->userRepository->find($id);
             if (!$user) {
-                $response = new Response(null, HTTP_NO_CONTENT);
+                $response = new Response(null, Response::HTTP_NO_CONTENT);
                 $response->setSharedMaxAge(3600);
                 $response->headers->addCacheControlDirective('must-revalidate', true);
             }
         }
         if (!$user) {
-            return new Response(Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['User NOT FOUND'],Response::HTTP_NOT_FOUND);
         }
 
         $this->entityManager->remove($user);
         $this->entityManager->flush();
-        return $response;
+        return ;
     }
 }

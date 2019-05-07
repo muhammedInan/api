@@ -92,7 +92,6 @@ class LinkedinProvider implements UserProviderInterface
         $data = \json_decode($body, true);
         $user = $this->em->getRepository(EntityUser::class)->findOneBy($data['localizedFirstName']);
         $user->setToken($token);
-        $user->setEmail('monemail.fr');
         $user->setFirstName($data['localizedFirstName']);
         $this->em->flush();
 

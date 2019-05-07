@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ClientRepository")
@@ -29,7 +30,9 @@ class Client
     protected $adress;
    
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="client")
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="client",fetch="LAZY")
+     * @Groups({"details"}) 
+     * 
      */
     private $users;
 

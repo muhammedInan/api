@@ -63,8 +63,8 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
         $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
             'form_params' => [
-                'client_id' => '7762mkrd0m4gif',
-                'client_secret' => 'BuGnWlmygeQQRgx2',
+                'client_id' => '',
+                'client_secret' => '',
                 'code' => $code,
                 'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
                 'grant_type' => 'authorization_code',

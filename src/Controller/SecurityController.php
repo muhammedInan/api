@@ -50,7 +50,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    
+
 
     /**
      * @Route("/login", name="login")
@@ -70,18 +70,17 @@ class SecurityController extends AbstractController
      */
     public function show(int $id, SerializerInterface $serializer)
     {
-       // if ($client = $this->getUser()->getClient() !== null) {
-            $user = $this->userRepository->find($id);
-            
-            $response = new Response($this->serializer->serialize($user, 'json',SerializationContext::create()->setGroups(array('details'))), Response::HTTP_OK);
-            $response->setSharedMaxAge(3600);
-            $response->headers->addCacheControlDirective('must-revalidate', true);
-               if ($user == null) {
-              return new JsonResponse(['User NOT FOUND'],Response::HTTP_NOT_FOUND);
-            }
-        
-            return $response;
-        
+        // if ($client = $this->getUser()->getClient() !== null) {
+        $user = $this->userRepository->find($id);
+
+        $response = new Response($this->serializer->serialize($user, 'json', SerializationContext::create()->setGroups(array('details'))), Response::HTTP_OK);
+        $response->setSharedMaxAge(3600);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+        if ($user == null) {
+            return new JsonResponse(['User NOT FOUND'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $response;
     }
 
     /**
@@ -89,7 +88,7 @@ class SecurityController extends AbstractController
      */
     public function users(SerializerInterface $serializer)
     {
-        if ( $this->getUser() !== null) {
+        if ($this->getUser() !== null) {
             $users = $this->userRepository->findAll();
             $response = new Response($serializer->serialize($users, 'json'), Response::HTTP_OK);
             $response->setSharedMaxAge(3600);
@@ -105,16 +104,15 @@ class SecurityController extends AbstractController
     public function create(Request $request, SerializerInterface $serializer)
     {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
-        $client = $this->getUser()->getClient();
+        $client = $this->getUser();
         $user->setClient($client);
 
-        
+
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        
+
         $user = $this->userRepository->find($user->getId());
-        return new Response($serializer->serialize($user,'json',SerializationContext::create()->setGroups(array('details'))), Response::HTTP_CREATED);
-        
+        return new Response($serializer->serialize($user, 'json', SerializationContext::create()->setGroups(array('details'))), Response::HTTP_CREATED);
     }
 
     /**
@@ -122,20 +120,24 @@ class SecurityController extends AbstractController
      */
     public function delete($id)
     {
-        if ($client = $this->getUser()->getClient() !== null) {
+        $client = $this->getUser();
+        if ($client  !== null) {
             $user = $this->userRepository->find($id);
-            if (!$user) {
-                $response = new Response(null, Response::HTTP_NO_CONTENT);
-                $response->setSharedMaxAge(3600);
-                $response->headers->addCacheControlDirective('must-revalidate', true);
-            }
-        }
-        if (!$user) {
-            return new JsonResponse(['User NOT FOUND'],Response::HTTP_NOT_FOUND);
-        }
 
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
-        return ;
+            if (!$user) {
+                return new JsonResponse('User NOT FOUND', Response::HTTP_NOT_FOUND);
+            }
+            if ($user->getClient() !== $client) {
+                dd($user, $client);
+                return new JsonResponse('action non autorisé', Response::HTTP_FORBIDDEN);
+            }
+            $response = new Response(null, Response::HTTP_NO_CONTENT);
+            $response->setSharedMaxAge(3600);
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+            return $response;
+        }
+        return new JsonResponse('authentication required', Response::HTTP_UNAUTHORIZED);
     }
 }

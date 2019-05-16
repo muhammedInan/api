@@ -11,6 +11,7 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +20,7 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
     private $repository;
     private $linkedinProvider;
 
-    public function __construct(LinkedinProvider $linkedinProvider, UserRepository $repository)
+    public function __construct(LinkedinProvider $linkedinProvider, ClientRepository $repository)
     {
         $this->linkedinProvider = $linkedinProvider;
         $this->repository = $repository;
@@ -44,22 +45,22 @@ class OAuthAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         if (isset($credentials['bearer'])) {
-            $user = $this->repository->findOneBy(['token' => $credentials['bearer']]);
-            if (null == $user) {
+            $client = $this->repository->findOneBy(['token' => $credentials['bearer']]);
+            if (null == $client) {
                 return;
             }
-            return $user;
+            return $client;
         }
         if (null == $credentials['code']) {
             return;
         }
         $token =  $this->linkedinProvider->getAccessTokenFromAPI($credentials['code']);
-        $user = $this->linkedinProvider->getUserFromAPI($token);
+        $client = $this->linkedinProvider->getUserFromAPI($token);
 
-        return $user;
+        return $client;
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $client)
     {
         return true;
     }

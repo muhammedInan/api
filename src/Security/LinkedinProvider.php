@@ -18,6 +18,7 @@ use App\Entity\User as EntityUser;
 class LinkedinProvider implements UserProviderInterface
 {
     private $client;
+    private $user;
     private $em;
 
     public function __construct(EntityManagerInterface $em)
@@ -34,17 +35,19 @@ class LinkedinProvider implements UserProviderInterface
         if (!$userData) {
             throw new \LogicException('Did not managed to get your user info from Github.');
         }
-        $user = new User($username, null);
-        return $user;
+       // $user = new User($username, null);
+        //return $user;
+        $client = new EntityClient($username, null);
+        return $client;
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $client)
     {
-        $class = get_class($user);
+        $class = get_class($client);
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException();
         }
-        return $user;
+        return $client;
     }
 
 
@@ -60,8 +63,8 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
         $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
             'form_params' => [
-                'client_id' => '',
-                'client_secret' => '',
+                'client_id' => '7762mkrd0m4gif',
+                'client_secret' => 'BuGnWlmygeQQRgx2',
                 'code' => $code,
                 'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
                 'grant_type' => 'authorization_code',
@@ -90,16 +93,28 @@ class LinkedinProvider implements UserProviderInterface
             throw new \LogicException('Did not managed to get your user into from Linkedin');
         }
         $data = \json_decode($body, true);
-        $user = $this->em->getRepository(EntityUser::class)->findOneBy($data['localizedFirstName']);
-        $user->setToken($token);
-        $user->setFirstName($data['localizedFirstName']);
+        
+        $entityClient = $this->em->getRepository(EntityClient::class)->findOneBy(['name' => $data['localizedLastName']]);
+        
+        if (!$entityClient )
+        {
+            $entityClient = new EntityClient();
+            $entityClient->setName($data['localizedLastName']);
+        }
+       
+        $entityClient->setToken($token);
+        if(!$entityClient)
+        {
+            $this->em->persist($entityClient);
+        }
         $this->em->flush();
+        
 
-        return $user;
+        return $entityClient;
     }
 
     public function supportsClass($class)
     {
-        return 'App\Entity\User' === $class;
+        return 'App\Entity\Client' === $class;
     }
 }

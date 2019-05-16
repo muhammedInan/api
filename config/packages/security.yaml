@@ -3,8 +3,8 @@ security:
     providers:
         users: 
             entity: 
-                class: App\Entity\User
-                property: email
+                class: App\Entity\Client
+                property: name
 
     
 

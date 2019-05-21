@@ -20,10 +20,15 @@ class LinkedinProvider implements UserProviderInterface
     private $client;
     private $user;
     private $em;
+    private $clientId;
+    private $secrectId;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em,$clientId,$secretId )
     {
        $this->em = $em;
+       $this->clientId = $clientId;
+       $this->secretId = $secretId;
+
     }
 
     public function loadUserByUsername($username)
@@ -63,8 +68,8 @@ class LinkedinProvider implements UserProviderInterface
         $client = new \GuzzleHttp\Client();
         $response = $client->request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
             'form_params' => [
-                'client_id' => '',
-                'client_secret' => '',
+                'client_id' => $this->clientId,
+                'client_secret' => $this->secretId,
                 'code' => $code,
                 'redirect_uri' => 'http://127.0.0.1:8000/api/signin',
                 'grant_type' => 'authorization_code',

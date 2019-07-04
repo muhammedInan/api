@@ -103,11 +103,8 @@
       <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
       <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
       <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
-      <path value="$PROJECT_DIR$/vendor/friendsofsymfony/rest-bundle" />
-      <path value="$PROJECT_DIR$/vendor/willdurand/negotiation" />
       <path value="$PROJECT_DIR$/vendor/willdurand/hateoas" />
       <path value="$PROJECT_DIR$/vendor/willdurand/hateoas-bundle" />
-      <path value="$PROJECT_DIR$/vendor/willdurand/jsonp-callback-validator" />
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/promises" />
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/guzzle" />
@@ -134,7 +131,11 @@
       <path value="$PROJECT_DIR$/vendor/doctrine/doctrine-fixtures-bundle" />
       <path value="$PROJECT_DIR$/vendor/doctrine/data-fixtures" />
       <path value="$PROJECT_DIR$/vendor/psr/http-message" />
-      <path value="$PROJECT_DIR$/vendor/symfony/templating" />
+      <path value="$PROJECT_DIR$/vendor/knpuniversity/oauth2-client-bundle" />
+      <path value="$PROJECT_DIR$/vendor/knplabs/knp-components" />
+      <path value="$PROJECT_DIR$/vendor/knplabs/knp-paginator-bundle" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-client" />
+      <path value="$PROJECT_DIR$/vendor/league/oauth2-linkedin" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.1" />
